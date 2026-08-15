@@ -103,6 +103,6 @@ body:
       label: What I've Already Tried
       description: List any fixes or workarounds you've already attempted.
       placeholder: |
-        - Ran `hermes update`
-        - Tried reinstalling with `pip install -e ".[all]"`
+        - Ran the Hermes Cursor UI installer again
+        - Confirmed the regular `hermes` command still works
         - Checked that OPENROUTER_API_KEY is set in ~/.hermes/.env
