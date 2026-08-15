@@ -8,8 +8,8 @@ body:
       value: |
         Thanks for the suggestion! Before submitting, please consider:
 
-        - **Is this a new skill?** Most capabilities should be [skills, not tools](https://github.com/NousResearch/hermes-agent/blob/main/CONTRIBUTING.md#should-it-be-a-skill-or-a-tool). If it's a specialized integration (crypto, NFT, niche SaaS), it belongs on the Skills Hub, not bundled.
-        - **Search [existing issues](https://github.com/NousResearch/hermes-agent/issues)** — someone may have already proposed this.
+        - Is this request specific to the browser UI? General Hermes capabilities should be proposed to the upstream Hermes Agent project.
+        - **Search [existing issues](https://github.com/mtahaakhan/Hermes-Cursor-UI/issues)** — someone may have already proposed this.
 
   - type: textarea
     id: problem
@@ -28,8 +28,8 @@ body:
       label: Proposed Solution
       description: How do you think this should work? Be as specific as you can — CLI flags, config options, UI behavior.
       placeholder: |
-        Add a `--foo` flag to `hermes chat` that enables...
-        Or: Add a config key `bar.baz` that controls...
+        Add a workbench action that...
+        Or: Add a `--foo` option to `hermes-cursor` that...
     validations:
       required: true
 
@@ -44,11 +44,11 @@ body:
     attributes:
       label: Feature Type
       options:
-        - New tool
-        - New bundled skill
-        - CLI improvement
-        - Gateway / messaging improvement
-        - Configuration option
+        - Browser UI / workbench
+        - Launcher / installer
+        - Hermes integration
+        - Accessibility
+        - Configuration experience
         - Performance / reliability
         - Developer experience (tests, docs, CI)
         - Other

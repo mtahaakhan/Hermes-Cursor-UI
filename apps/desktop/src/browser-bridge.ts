@@ -8,7 +8,10 @@
 
 export {}
 
-const TOKEN = 'hermes-cursor-local'
+// Production HTML receives a fresh token from the loopback Hermes server.
+// Vite development has no HTML injection, so it uses the fixed token owned by
+// scripts/dev-browser.mjs instead.
+const TOKEN = window.__HERMES_SESSION_TOKEN__ ?? 'hermes-cursor-local'
 const noopOff = () => () => undefined
 
 const terminalSessions = new Map<

@@ -1,61 +1,64 @@
 ---
 sidebar_position: 4
 title: Browser UI
-description: Launch the Cursor-style Hermes interface in your browser.
+description: Install and launch the Cursor-style Hermes interface.
 ---
 
-# Hermes Browser UI
+# Hermes Cursor UI
 
-Hermes ships a Cursor-style browser interface for chat, sessions, files,
-previews, tools, and an integrated terminal. It uses the same Hermes agent and
-gateway as the CLI; there is no Electron application runtime to install or
-update. The optional macOS app icon is only a launcher for the browser command.
+Hermes Cursor UI is an independent open-source browser workbench for chat,
+sessions, files, previews, tools, and an integrated terminal. It uses the same
+Hermes configuration and data as the CLI without an Electron runtime.
 
-## Launch
+## Install
 
-From the repository root, run:
+Install Hermes Agent first, then run:
 
 ```bash
-npm run dev:browser
+curl -fsSL https://raw.githubusercontent.com/mtahaakhan/Hermes-Cursor-UI/main/install.sh | bash
+hermes-cursor
 ```
 
-The launcher starts a local Hermes backend on `127.0.0.1:9121`, starts the UI
-on `127.0.0.1:5174`, waits for both services, and opens the UI in your default
-browser. Press `Ctrl+C` in the launching terminal to stop services it started.
+On Windows PowerShell:
 
-The equivalent Hermes command is:
-
-```bash
-hermes desktop
+```powershell
+irm https://raw.githubusercontent.com/mtahaakhan/Hermes-Cursor-UI/main/install.ps1 | iex
+hermes-cursor
 ```
 
-`hermes gui` remains an alias. To start in a particular project:
+The installer places the UI in `~/.hermes/cursor-ui`, builds production assets,
+and adds the independent `hermes-cursor` command. It does not replace the
+official `hermes` command.
+
+## Launch options
 
 ```bash
-hermes desktop --cwd /path/to/project
+hermes-cursor --cwd /path/to/project
+hermes-cursor --port 9130
+hermes-cursor --no-open
+hermes-cursor --rebuild
 ```
 
 ### macOS app icon
 
-Install a lightweight Finder/Dock launcher once:
-
 ```bash
-hermes desktop --install-app
+hermes-cursor --install-app
 ```
 
-Opening `Hermes.app` after that runs the same browser launcher. It does not
-contain Electron and does not create a second private Hermes backend. An older
-app bundle is moved to Trash before replacement, so the migration is
-recoverable.
+The resulting `Hermes.app` is only a launcher for the local browser UI. It does
+not contain Electron or create another Hermes installation.
 
 ## Development
 
-Run only the Vite renderer when a compatible backend is already listening on
-port `9121`:
-
 ```bash
-npm run dev:renderer --workspace apps/desktop
+git clone https://github.com/mtahaakhan/Hermes-Cursor-UI.git
+cd Hermes-Cursor-UI
+npm ci
+npm run dev:browser
 ```
+
+The development launcher uses ports `9121` and `5174`. Production serves the
+compiled UI directly from the authenticated loopback Hermes server.
 
 Useful checks:
 
@@ -65,15 +68,10 @@ npm run test --workspace apps/desktop
 npm run build --workspace apps/desktop
 ```
 
-The browser capability adapter is `apps/desktop/src/browser-bridge.ts`. It
-routes JSON-RPC, REST, filesystem, logs, and terminal traffic through the local
-backend and exposes browser-safe replacements for host features.
-
 ## Troubleshooting
 
-- If port `9121` or `5174` is occupied by an unrelated process, stop that
-  process and launch again.
-- If Hermes cannot find Python, activate the repository `.venv` or install
-  Hermes so `~/.hermes/hermes-agent/venv` exists.
-- If the page was already open, reload once after restarting the launcher.
-- Backend logs are available through the UI or with `hermes logs`.
+- If the selected port is occupied, stop that process or pass another `--port`.
+- If Hermes Python cannot be found, set `HERMES_PYTHON` to the interpreter used
+  by Hermes.
+- If the command is missing, add `~/.local/bin` to `PATH`.
+- Backend logs remain available with `hermes logs`.

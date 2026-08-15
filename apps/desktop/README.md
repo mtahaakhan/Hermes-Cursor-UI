@@ -1,10 +1,32 @@
 # Hermes Cursor UI
 
-Browser-first React interface for Hermes Agent. It keeps the full Hermes agent,
-sessions, tools, projects, and settings behind a Cursor-style workbench without
-shipping a native Electron shell.
+Browser-first React interface for Hermes Agent. It keeps sessions, tools,
+projects, files, settings, and the terminal behind a Cursor-style workbench
+without shipping a native Electron shell.
 
-## Run
+## Public installation
+
+With Hermes Agent already installed:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mtahaakhan/Hermes-Cursor-UI/main/install.sh | bash
+hermes-cursor
+```
+
+Production mode serves the compiled React application directly from the
+authenticated loopback Hermes server. It does not run Vite and does not need
+Node.js after the installer has built the assets.
+
+On macOS, install a Finder/Dock launcher with:
+
+```bash
+hermes-cursor --install-app
+```
+
+`Hermes.app` is a lightweight launcher for the same browser command. It does
+not contain Electron or start a second private backend.
+
+## Development
 
 From the repository root:
 
@@ -12,44 +34,36 @@ From the repository root:
 npm run dev:browser
 ```
 
-On macOS, install a Finder/Dock launcher once with:
+The development launcher starts a loopback Hermes backend on `9121`, Vite on
+`5174`, opens the browser, and owns their shared lifecycle.
+
+Build and run production mode from a checkout:
 
 ```bash
-hermes desktop --install-app
+npm run build --workspace apps/desktop
+./bin/hermes-cursor
 ```
-
-`Hermes.app` is a lightweight launcher for the same browser command; it does
-not contain Electron or start a second private backend. If an older Hermes app
-exists, it is preserved in Trash before the launcher is installed.
-
-The launcher:
-
-- finds a Hermes Python environment;
-- starts `hermes serve` on `127.0.0.1:9121` with a local session token;
-- starts Vite on `127.0.0.1:5174`;
-- opens the UI in the default browser; and
-- stops both owned processes together when you press `Ctrl+C`.
-
-If either service is already healthy, the launcher reuses it.
 
 ## Architecture
 
 - `src/` owns the React application, routes, state, transcript, composer, and
   supporting workbench panels.
-- `src/browser-bridge.ts` supplies browser-safe host capabilities and routes
-  REST/WebSocket traffic through Vite's same-origin `/api` proxy.
+- `src/browser-bridge.ts` owns browser-safe capabilities and authenticated
+  REST/WebSocket transport.
 - `apps/shared/` owns the framework-independent JSON-RPC/WebSocket transport.
-- `hermes serve` owns sessions, model calls, tools, files, and other backend
+- The Hermes backend owns sessions, model calls, tools, files, and terminal
   truth.
+- `hermes_cli/cursor_ui.py` owns production asset preparation.
+- `bin/hermes-cursor` is the public launcher interface.
 
 The browser never imports Node APIs. Host-specific behavior belongs in the
-browser bridge or the backend, and unavailable native capabilities must degrade
-without taking down the interface.
+browser bridge or backend. Unavailable native capabilities must degrade without
+taking down the interface.
 
 ## Commands
 
 ```bash
-npm run dev          # backend + Vite + browser
+npm run dev          # development backend + Vite + browser
 npm run dev:renderer # Vite only; expects a backend on port 9121
 npm run build        # production browser assets
 npm run typecheck
@@ -58,16 +72,5 @@ npm run test
 npm run check
 ```
 
-## Verification
-
-For changes to this package, run:
-
-```bash
-npm run typecheck
-npm run lint
-npm run test
-npm run build
-```
-
-Visual and interaction conventions live in [`DESIGN.md`](./DESIGN.md).
-Engineering rules live in [`AGENTS.md`](./AGENTS.md).
+Visual conventions live in [`DESIGN.md`](./DESIGN.md). Engineering rules live
+in [`AGENTS.md`](./AGENTS.md).

@@ -1,7 +1,7 @@
 {
-  "name": "hermes-agent",
+  "name": "hermes-cursor-ui",
   "version": "1.0.0",
-  "description": "An AI agent with advanced tool-calling capabilities, featuring a flexible toolsets system for organizing and managing tools.",
+  "description": "An open-source Cursor-style browser interface for Hermes Agent.",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -17,6 +17,8 @@
     "install:tui": "npm install --workspace ui-tui",
     "install:desktop": "npm install --workspace apps/desktop",
     "dev:browser": "npm run dev:browser --workspace apps/desktop",
+    "build:cursor": "npm run build --workspace apps/desktop",
+    "test:cursor": "npm run check --workspace apps/desktop",
     "audit:root": "npm audit --workspaces=false",
     "audit:web": "npm audit --workspace web",
     "audit:tui": "npm audit --workspace ui-tui",
@@ -28,13 +30,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NousResearch/Hermes-Agent.git"
+    "url": "git+https://github.com/mtahaakhan/Hermes-Cursor-UI.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/NousResearch/Hermes-Agent/issues"
+    "url": "https://github.com/mtahaakhan/Hermes-Cursor-UI/issues"
   },
-  "homepage": "https://github.com/NousResearch/Hermes-Agent#readme",
+  "homepage": "https://github.com/mtahaakhan/Hermes-Cursor-UI#readme",
   "dependencies": {
     "@streamdown/math": "1.0.2",
     "agent-browser": "0.26.0"

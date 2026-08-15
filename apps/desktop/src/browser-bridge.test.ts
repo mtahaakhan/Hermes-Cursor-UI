@@ -4,17 +4,19 @@ describe('browser bridge filesystem capabilities', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
     Reflect.deleteProperty(window, 'hermesDesktop')
+    Reflect.deleteProperty(window, '__HERMES_SESSION_TOKEN__')
     Reflect.deleteProperty(document.documentElement.dataset, 'runtime')
     window.localStorage.removeItem('hermes-desktop-mode-v1')
     document.title = ''
   })
 
   it('reads a local file data URL through the authenticated filesystem API', async () => {
-    const fetch = vi.fn(async () =>
-      new Response(JSON.stringify({ dataUrl: 'data:text/plain;base64,aGVsbG8=' }), {
-        headers: { 'Content-Type': 'application/json' },
-        status: 200
-      })
+    const fetch = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ dataUrl: 'data:text/plain;base64,aGVsbG8=' }), {
+          headers: { 'Content-Type': 'application/json' },
+          status: 200
+        })
     )
 
     vi.stubGlobal('fetch', fetch)
@@ -40,11 +42,12 @@ describe('browser bridge filesystem capabilities', () => {
   })
 
   it('provides recent logs to the renderer error boundary', async () => {
-    const fetch = vi.fn(async () =>
-      new Response(JSON.stringify({ file: 'agent', lines: ['renderer recovered'] }), {
-        headers: { 'Content-Type': 'application/json' },
-        status: 200
-      })
+    const fetch = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ file: 'agent', lines: ['renderer recovered'] }), {
+          headers: { 'Content-Type': 'application/json' },
+          status: 200
+        })
     )
 
     vi.stubGlobal('fetch', fetch)
@@ -62,6 +65,31 @@ describe('browser bridge filesystem capabilities', () => {
       '/api/logs?lines=200',
       expect.objectContaining({
         headers: expect.objectContaining({ 'X-Hermes-Session-Token': 'hermes-cursor-local' })
+      })
+    )
+  })
+
+  it('uses the ephemeral token injected by the production server', async () => {
+    const fetch = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ file: 'agent', lines: [] }), {
+          headers: { 'Content-Type': 'application/json' },
+          status: 200
+        })
+    )
+
+    vi.stubGlobal('fetch', fetch)
+    window.__HERMES_SESSION_TOKEN__ = 'ephemeral-production-token'
+    Reflect.deleteProperty(window, 'hermesDesktop')
+    vi.resetModules()
+
+    await import('./browser-bridge')
+    await window.hermesDesktop.getRecentLogs()
+
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/logs?lines=200',
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'X-Hermes-Session-Token': 'ephemeral-production-token' })
       })
     )
   })

@@ -13,6 +13,8 @@ export {}
 
 declare global {
   interface Window {
+    /** Ephemeral token injected by the loopback Hermes production server. */
+    __HERMES_SESSION_TOKEN__?: string
     hermesDesktop: {
       /** Browser-hosted renderer marker. */
       runtime?: 'browser'

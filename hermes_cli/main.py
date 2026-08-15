@@ -5826,12 +5826,6 @@ def cmd_gui(args: argparse.Namespace):
         if installed.replaced_app_path is not None:
             print(f"  Previous app preserved at: {installed.replaced_app_path}")
 
-    npm = _resolve_node_runtime_npm()
-    if not npm:
-        print("Hermes Browser UI requires Node.js/npm, but npm was not found on PATH.")
-        print("Install Node.js, then run: hermes desktop")
-        sys.exit(1)
-
     from hermes_constants import with_hermes_node_path
 
     env = with_hermes_node_path()
@@ -5841,14 +5835,78 @@ def cmd_gui(args: argparse.Namespace):
         env["HERMES_DESKTOP_CWD"] = cwd
         env["TERMINAL_CWD"] = cwd
 
+    if getattr(args, "dev", False):
+        npm = _resolve_node_runtime_npm()
+        if not npm:
+            print("Hermes Cursor UI development mode requires Node.js/npm.")
+            sys.exit(1)
+        print("→ Opening Hermes Cursor UI in development mode...", flush=True)
+        result = subprocess.run(
+            [npm, "run", "dev:browser"],
+            cwd=PROJECT_ROOT,
+            env=env,
+            check=False,
+        )
+        sys.exit(result.returncode)
+
+    from hermes_cli.cursor_ui import CursorUiError, cursor_ui_dist, prepare_cursor_ui
+
+    needs_build = not (cursor_ui_dist(PROJECT_ROOT) / "index.html").is_file()
+    npm = _resolve_node_runtime_npm() if needs_build or getattr(args, "rebuild", False) else None
+    try:
+        dist = prepare_cursor_ui(
+            PROJECT_ROOT,
+            npm=npm,
+            rebuild=getattr(args, "rebuild", False),
+        )
+    except CursorUiError as exc:
+        print(f"Could not prepare Hermes Cursor UI: {exc}")
+        sys.exit(1)
+
     print("→ Opening Hermes Cursor UI in your browser...", flush=True)
-    result = subprocess.run(
-        [npm, "run", "dev:browser"],
-        cwd=PROJECT_ROOT,
-        env=env,
-        check=False,
+    dashboard_args = argparse.Namespace(
+        headless_backend=False,
+        host=getattr(args, "host", "127.0.0.1"),
+        insecure=False,
+        isolated=False,
+        no_open=getattr(args, "no_open", False),
+        open_profile="",
+        port=getattr(args, "port", 9121),
+        skip_build=True,
+        ssh_owner_nonce=None,
+        ssh_session_token_file=None,
+        status=False,
+        stop=False,
     )
-    sys.exit(result.returncode)
+    environment_updates = {
+        "HERMES_WEB_DIST": str(dist),
+        **(
+            {
+                "HERMES_DESKTOP_CWD": env["HERMES_DESKTOP_CWD"],
+                "TERMINAL_CWD": env["TERMINAL_CWD"],
+            }
+            if requested_cwd
+            else {}
+        ),
+    }
+    previous_environment = {
+        key: os.environ.get(key)
+        for key in (*environment_updates, "HERMES_SERVE_HEADLESS")
+    }
+    try:
+        os.environ.update(environment_updates)
+        os.environ.pop("HERMES_SERVE_HEADLESS", None)
+        cmd_dashboard(dashboard_args)
+    except KeyboardInterrupt:
+        print("\nHermes Cursor UI stopped.")
+        sys.exit(130)
+    finally:
+        for key, value in previous_environment.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+    sys.exit(0)
 
 
 

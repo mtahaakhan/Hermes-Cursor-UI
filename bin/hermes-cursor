@@ -1,0 +1,50 @@
+#!/bin/sh
+set -eu
+
+script_path=$0
+while [ -L "$script_path" ]; do
+  script_dir=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
+  link_target=$(readlink "$script_path")
+  case "$link_target" in
+    /*) script_path=$link_target ;;
+    *) script_path=$script_dir/$link_target ;;
+  esac
+done
+
+project_root=$(CDPATH= cd -- "$(dirname -- "$script_path")/.." && pwd)
+hermes_root=${HERMES_HOME:-$HOME/.hermes}
+
+find_python() {
+  if [ -n "${HERMES_PYTHON:-}" ]; then
+    printf '%s\n' "$HERMES_PYTHON"
+    return
+  fi
+
+  for candidate in \
+    "$project_root/.venv/bin/python" \
+    "$project_root/venv/bin/python" \
+    "$hermes_root/hermes-agent/venv/bin/python" \
+    "/usr/local/lib/hermes-agent/venv/bin/python" \
+    "python3" \
+    "python"
+  do
+    if [ "${candidate#*/}" != "$candidate" ] && [ ! -x "$candidate" ]; then
+      continue
+    fi
+    if (cd "$project_root" && "$candidate" -c 'import fastapi, uvicorn, yaml' >/dev/null 2>&1); then
+      printf '%s\n' "$candidate"
+      return
+    fi
+  done
+  return 1
+}
+
+if ! python_executable=$(find_python); then
+  echo "Hermes Cursor UI could not find a compatible Hermes Python environment." >&2
+  echo "Install Hermes first, or set HERMES_PYTHON to its Python executable." >&2
+  echo "https://github.com/NousResearch/hermes-agent" >&2
+  exit 1
+fi
+
+cd "$project_root"
+exec "$python_executable" -m hermes_cli.main desktop "$@"

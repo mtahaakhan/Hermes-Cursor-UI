@@ -9,11 +9,9 @@ body:
         Sorry you're having trouble! Please fill out the details below so we can help.
 
         **Quick checks first:**
-        - Run `hermes debug share` and paste the links in the Debug Report section below
-        - If you're in a chat session, you can use `/debug` instead — it does the same thing
-        - Try `hermes update` to get the latest version
-        - Check the [README troubleshooting section](https://github.com/NousResearch/hermes-agent#troubleshooting)
-        - For general questions, consider the [Nous Research Discord](https://discord.gg/NousResearch) for faster help
+        - Run the Hermes Cursor UI installer again to update to the latest `main`
+        - Confirm `hermes` works before launching `hermes-cursor`
+        - Check the [README](https://github.com/mtahaakhan/Hermes-Cursor-UI#readme)
 
   - type: textarea
     id: description
@@ -21,8 +19,7 @@ body:
       label: What's Going Wrong?
       description: Describe what you're trying to do and where it fails.
       placeholder: |
-        I ran `hermes setup` and selected Nous Portal, but when I try to
-        start the gateway I get...
+        I installed `hermes-cursor`, but when I launch it I get...
     validations:
       required: true
 
@@ -33,9 +30,9 @@ body:
       description: What did you do? Include the exact commands you ran.
       placeholder: |
         1. Ran the install script: `curl -fsSL ... | bash`
-        2. Ran `hermes setup` and chose "Quick setup"
-        3. Selected OpenRouter, entered API key
-        4. Ran `hermes chat` and got error...
+        2. Confirmed `hermes` works
+        3. Ran `hermes-cursor`
+        4. The browser opened and showed...
     validations:
       required: true
 
@@ -44,10 +41,9 @@ body:
     attributes:
       label: Installation Method
       options:
-        - Install script (curl | bash)
-        - Manual clone + pip/uv install
-        - PowerShell installer (Windows)
-        - Docker
+        - Hermes Cursor install script (curl | bash)
+        - Hermes Cursor PowerShell installer
+        - Manual clone + npm build
         - Other
     validations:
       required: true
