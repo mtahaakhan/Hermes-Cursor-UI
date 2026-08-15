@@ -56,6 +56,9 @@ For changes outside the browser UI, follow the repository-level guidance in
   backend lifecycle.
 - Keep upstream attribution intact.
 - Include screenshots for visible interface changes.
+- Capture screenshots from a disposable/demo Hermes profile containing only
+  synthetic sessions. Never publish a contributor's real chats, session
+  titles, projects, paths, account details, or credentials.
 
 By submitting a contribution, you agree that it may be distributed under this
 repository's MIT license.

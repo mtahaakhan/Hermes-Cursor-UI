@@ -12,8 +12,6 @@ is no Electron runtime and no second private desktop backend.
 > Anysphere, Nous Research, or the Hermes Agent maintainers. “Cursor” is used
 > descriptively; Cursor and its marks belong to their respective owners.
 
-![Hermes Cursor UI](cursor-ui-web-verified.png)
-
 ## Install
 
 ### Requirements
